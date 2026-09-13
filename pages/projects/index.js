@@ -2,45 +2,47 @@ import { useEffect, useState } from "react";
 import CategoryChip from "../../components/CategoryChip";
 import PageNameSection from "../../components/PageNameSection";
 import ProjectList from "../../components/ProjectList";
-import { projects } from "../../data/projects";
 import Container from "../../components/Container";
 
-export default function Projects() {
-  const [filteredProjects, setFilteredProjects] = useState([]);
+const CATEGORY_CHIPS = [
+  "Packages",
+  "Business Cards",
+  "Logo",
+  "Banner",
+  "Kelk",
+  "Advertising",
+];
+
+export default function Projects({ projects = [], settings }) {
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [renderProjects, setRenderProjects] = useState(projects);
   const [isAllCategories, setIsAllCategories] = useState(true);
-  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    if (!categories === undefined || !categories.length < 1) {
-      let filtered = [];
-      projects.forEach((project) => {
-        if (categories.includes(project.category)) {
-          if (!filtered.includes(project)) {
-            filtered.push(project);
-          }
-        }
-      });
-      setRenderProjects(filtered);
-      setIsAllCategories(false);
-    } else {
+    if (selectedCategories.length === 0) {
       setRenderProjects(projects);
       setIsAllCategories(true);
+      return;
     }
-  }, [categories]);
 
-  const cats = ["Packages", "Business Cards", "Logo", "Banner", "Kelk", "Advertising"];
+    setRenderProjects(
+      projects.filter((project) =>
+        selectedCategories.includes(project.category)
+      )
+    );
+    setIsAllCategories(false);
+  }, [selectedCategories, projects]);
+
   return (
-    <Container className=" mx-auto px-4 my-auto py-4">
+    <Container settings={settings} className="mx-auto px-4 my-auto py-4">
       <div className="mt-10">
-        <PageNameSection title={"Discover my work"}></PageNameSection>
-        <div className="">
-          <div className="flex flex-wrap justify-center space-x-1 space-y-1 mx-auto h-25 my-6 mt-4">
+        <PageNameSection title={"Discover my work"} />
+        <div>
+          <div className="flex flex-wrap justify-center gap-2 mx-auto my-6 mt-4">
             <CategoryChip
               onClick={() => {
-                setCategories([]);
+                setSelectedCategories([]);
                 setIsAllCategories(true);
-                setFilteredProjects(projects);
               }}
               category="All Projects"
               key="All Projects"
@@ -48,31 +50,39 @@ export default function Projects() {
             >
               All Projects
             </CategoryChip>
-            {cats.map((cat, index) => (
+            {CATEGORY_CHIPS.map((cat) => (
               <CategoryChip
-                key={index}
+                key={cat}
                 category={cat}
                 onClick={() => {
-                  if (!categories.includes(cat)) {
-                    setCategories((categories) => [...categories, cat]);
+                  if (!selectedCategories.includes(cat)) {
+                    setSelectedCategories((prev) => [...prev, cat]);
                   } else {
-                    setCategories(categories.filter((e) => e !== cat));
+                    setSelectedCategories((prev) =>
+                      prev.filter((e) => e !== cat)
+                    );
                   }
                 }}
+                active={selectedCategories.includes(cat)}
               >
-                  {cat}
-                
+                {cat}
               </CategoryChip>
             ))}
           </div>
+          <ProjectList projects={renderProjects} />
         </div>
-        <div className="grid-rows-1">
-          <div className="flex w-256 grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-1 gap-4 ">
-            <ProjectList projects={renderProjects}></ProjectList>
-          </div>
-        </div>
-
       </div>
     </Container>
   );
+}
+
+export async function getServerSideProps() {
+  const { getPublishedProjects, getSiteSettings } = await import(
+    "../../lib/content"
+  );
+  const [projects, settings] = await Promise.all([
+    getPublishedProjects(),
+    getSiteSettings(),
+  ]);
+  return { props: { projects, settings } };
 }

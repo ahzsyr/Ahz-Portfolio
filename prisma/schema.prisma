@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique @db.VarChar(100)
+  slug      String    @unique @db.VarChar(120)
+  sortOrder Int       @default(0)
+  projects  Project[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Project {
+  id             Int            @id @default(autoincrement())
+  slug           String         @unique @db.VarChar(160)
+  title          String         @db.VarChar(200)
+  description    String         @db.Text
+  client         String         @db.VarChar(200)
+  tools          Json
+  coverPath      String         @db.VarChar(500)
+  featured       Boolean        @default(false)
+  featuredOrder  Int            @default(0)
+  status         String         @default("published") @db.VarChar(20)
+  seoTitle       String?        @db.VarChar(200)
+  seoDescription String?        @db.Text
+  categoryId     Int
+  category       Category       @relation(fields: [categoryId], references: [id])
+  media          ProjectMedia[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([status])
+  @@index([featured, featuredOrder])
+}
+
+model ProjectMedia {
+  id        Int      @id @default(autoincrement())
+  projectId Int
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  path      String   @db.VarChar(500)
+  alt       String?  @db.VarChar(255)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+}
+
+model Experience {
+  id        Int      @id @default(autoincrement())
+  position  String   @db.VarChar(200)
+  company   String   @db.VarChar(200)
+  period    String   @db.VarChar(100)
+  bullets   Json
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSettings {
+  id           Int      @id @default(1)
+  siteName     String   @db.VarChar(120)
+  personName   String   @db.VarChar(120)
+  tagline      String   @db.Text
+  headline     String   @db.VarChar(255)
+  heroSupporting String @db.Text
+  aboutBio     String   @db.Text
+  locations    Json
+  tools        Json
+  phone        String   @db.VarChar(50)
+  phoneDisplay String   @db.VarChar(80)
+  email        String   @db.VarChar(160)
+  location     String   @db.VarChar(160)
+  linkedin     String   @db.VarChar(255)
+  linkedinHandle String @db.VarChar(80)
+  github       String   @db.VarChar(255)
+  facebook     String   @db.VarChar(255)
+  resumePath   String   @db.VarChar(255)
+  ogImagePath  String   @db.VarChar(255)
+  canonicalUrl String   @db.VarChar(255)
+  gaId         String   @db.VarChar(40)
+  updatedAt    DateTime @updatedAt
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  firstName String   @db.VarChar(100)
+  lastName  String   @db.VarChar(100)
+  email     String   @db.VarChar(160)
+  phone     String?  @db.VarChar(50)
+  body      String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

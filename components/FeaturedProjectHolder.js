@@ -26,28 +26,29 @@ export const FeaturedProjectHolder = ({ project, styles, large, margined }) => {
           <p className="text-base leading-4 text-white mt-2">
             {project.category}
           </p>
-          <Link href="/projects/[id]" as={`/projects/${project.id}`}>
-            <div className="focus:outline-none focus:underline flex items-center mt-4 cursor-pointer text-white hover:text-gray-200 underline">
-              <p className="pr-2 text-sm font-medium leading-none ">
-                Project Details
-              </p>
-              <svg
-                className="fill-stroke"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5.75 12.5L10.25 8L5.75 3.5"
-                  stroke="currentColor"
-                  strokeWidth={"2"}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
+          <Link
+            href={`/projects/${project.slug || project.id}`}
+            className="focus:outline-none focus:underline flex items-center mt-4 cursor-pointer text-white hover:text-gray-200 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          >
+            <p className="pr-2 text-sm font-medium leading-none ">
+              Project Details
+            </p>
+            <svg
+              className="fill-stroke"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5.75 12.5L10.25 8L5.75 3.5"
+                stroke="currentColor"
+                strokeWidth={"2"}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </Link>
         </div>
       </div>

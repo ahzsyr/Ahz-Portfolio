@@ -1,32 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-const CategoryChip = ({ category, onClick, allActive }) => {
-  const [isActive, setIsActive] = useState(false);
-  const [allActiveFlag, setAllActiveFlag] = useState(allActive);
-
-  useEffect(() => {
-    setAllActiveFlag(allActive ? true : false);
-  }, [allActive]);
-  const toggleClass = () => {
-    setIsActive(!isActive);
-  };
+const CategoryChip = ({ category, onClick, allActive, active }) => {
+  const isActive = Boolean(active || allActive);
   const styles = {
-    active: `px-4 py-2 rounded-full text-white bg-red-500 font-bold text-sm flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease`,
+    active:
+      "px-4 py-2 rounded-full text-white bg-[var(--color-brand)] font-bold text-sm flex align-center w-max cursor-pointer transition duration-300 ease focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)]",
     inactive:
-      "px-4 py-2 rounded-full text-gray-500 bg-gray-200 font-semibold text-sm flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease",
+      "px-4 py-2 rounded-full text-gray-600 bg-gray-200 font-semibold text-sm flex align-center w-max cursor-pointer transition duration-300 ease hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)]",
   };
+
   return (
-    <span
-      onClick={() => {
-        toggleClass();
-        onClick();
-      }}
-      className={`${
-        isActive || allActiveFlag ? styles.active : styles.inactive
-      }`}
-    >
+    <button type="button" onClick={onClick} className={isActive ? styles.active : styles.inactive}>
       {category}
-    </span>
+    </button>
   );
 };
 

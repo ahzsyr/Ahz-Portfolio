@@ -2,30 +2,30 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import Footer from "./Footer";
 import Navigation from "./Navigation";
+import { siteConfig } from "../config/site";
 
-const Container = ({ children, ...customMeta }) => {
+const Container = ({ children, settings, ...customMeta }) => {
   const router = useRouter();
+  const cfg = settings || siteConfig;
   const meta = {
-    title: "Ali Hasan Zahedah Portfolio",
-    description: `Ali Zahedah personal website. I'm developer, designer, and human.`,
-    image: "/avatar.png",
+    title: `${cfg.personName} | ${cfg.siteName}`,
+    description: cfg.tagline,
+    image: cfg.ogImagePath || "/avatar.png",
     type: "website",
     ...customMeta,
   };
+  const canonicalBase = (cfg.canonicalUrl || "").replace(/\/$/, "");
+
   return (
     <>
       <Head>
         <title>{meta.title}</title>
         <meta name="robots" content="follow, index" />
         <meta content={meta.description} name="description" />
-        <meta
-          property="og:url"
-          content={`https://ahz-two.vercel.app${router.asPath}`}
-        />
-        <link rel="canonical" href={`https://ahz-two.vercel.app${router.asPath}`} />
-        
+        <meta property="og:url" content={`${canonicalBase}${router.asPath}`} />
+        <link rel="canonical" href={`${canonicalBase}${router.asPath}`} />
         <meta property="og:type" content={meta.type} />
-        <meta property="og:site_name" content="Ali Zahedah" />
+        <meta property="og:site_name" content={cfg.siteName} />
         <meta property="og:description" content={meta.description} />
         <meta property="og:title" content={meta.title} />
         <meta property="og:image" content={meta.image} />
@@ -34,14 +34,13 @@ const Container = ({ children, ...customMeta }) => {
         )}
       </Head>
 
-      <main className="flex justify-center items-center">
-        <div className="2xl:mx-auto 2xl:container lg:px-20 lg:py-16 md:py-12 md:px-6 py-9 px-4 w-96 sm:w-auto">
-          <Navigation />
+      <main className="flex justify-center items-center min-h-screen bg-[var(--color-surface)]">
+        <div className="2xl:mx-auto 2xl:container lg:px-20 lg:py-16 md:py-12 md:px-6 py-9 px-4 w-full sm:w-auto">
+          <Navigation settings={cfg} />
           {children}
-          <Footer />
+          <Footer settings={cfg} />
         </div>
       </main>
-      
     </>
   );
 };

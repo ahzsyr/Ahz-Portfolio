@@ -1,5 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-const colors = require("tailwindcss/colors");
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -8,10 +7,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        indigo: colors.indigo,
-        amber: colors.amber,
-        emerald: colors.emerald,
-        rose: colors.rose,
+        brand: {
+          DEFAULT: "var(--color-brand)",
+          deep: "var(--color-brand-deep)",
+        },
+        ink: "var(--color-ink)",
+        muted: "var(--color-muted)",
+        surface: "var(--color-surface)",
+      },
+      fontFamily: {
+        display: ["var(--font-display)", "Georgia", "serif"],
+        body: ["var(--font-body)", "Segoe UI", "sans-serif"],
       },
     },
   },

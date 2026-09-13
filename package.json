@@ -1,27 +1,44 @@
 {
-  "name": "ahz",
-  "version": "0.1.0",
+  "name": "azura-portfolio",
+  "version": "0.2.0",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
-    "build": "next build && next export",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:migrate": "prisma migrate deploy",
+    "db:push": "prisma db push",
+    "db:seed": "node prisma/seed.mjs",
+    "db:setup": "prisma db push && node prisma/seed.mjs",
+    "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.mjs"
   },
   "dependencies": {
-    "@vercel/analytics": "^0.1.5",
-    "framer-motion": "^7.6.7",
-    "next": "^13.0.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-rough-notation": "^1.0.3",
-    "react-scroll": "^1.8.8",
-    "react-scroll-parallax": "^3.3.2",
-    "swiper": "^8.4.4"
+    "@prisma/client": "5.22.0",
+    "bcryptjs": "^3.0.3",
+    "formidable": "^3.5.4",
+    "framer-motion": "^12.43.0",
+    "next": "^15.5.25",
+    "next-auth": "^4.24.15",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-rough-notation": "^1.0.8",
+    "react-scroll": "^1.9.3",
+    "react-scroll-parallax": "^3.5.0",
+    "swiper": "^11.2.10"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.13",
-    "postcss": "^8.4.19",
-    "tailwindcss": "^3.2.4"
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.34.0",
+    "eslint-config-next": "^15.5.25",
+    "postcss": "^8.5.6",
+    "prisma": "5.22.0",
+    "tailwindcss": "^3.4.19"
   }
 }

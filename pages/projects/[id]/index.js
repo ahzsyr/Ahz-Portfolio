@@ -1,34 +1,41 @@
 import ProjectDetails from "../../../components/ProjectDetails";
-import { projects } from "../../../data/projects";
 import Container from "../../../components/Container";
 
-const project = ({ project }) => {
+const ProjectPage = ({ project, settings }) => {
+  if (!project) {
+    return (
+      <Container settings={settings}>
+        <div className="mt-28 text-center">Project not found.</div>
+      </Container>
+    );
+  }
+
   return (
-    <Container>
+    <Container
+      settings={settings}
+      title={project.seoTitle || `${project.title} | ${settings.siteName}`}
+      description={project.seoDescription || project.description}
+      image={project.image}
+    >
       <div className="mt-28">
-        <ProjectDetails project={project}></ProjectDetails>
+        <ProjectDetails project={project} />
       </div>
     </Container>
   );
 };
 
-export const getStaticProps = async (context) => {
-  const project = projects.find((el) => el.id == context.params.id);
+export async function getServerSideProps(context) {
+  const { getProjectByParam, getSiteSettings } = await import("../../../lib/content");
+  const [project, settings] = await Promise.all([
+    getProjectByParam(context.params.id),
+    getSiteSettings(),
+  ]);
 
-  return {
-    props: {
-      project,
-    },
-  };
-};
+  if (!project) {
+    return { notFound: true };
+  }
 
-export const getStaticPaths = async () => {
-  const ids = projects.map((project) => project.id);
-  const paths = ids.map((id) => ({ params: { id: id.toString() } }));
-  return {
-    paths,
-    fallback: false,
-  };
-};
+  return { props: { project, settings } };
+}
 
-export default project;
+export default ProjectPage;
