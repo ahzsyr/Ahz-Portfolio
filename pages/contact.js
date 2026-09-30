@@ -1,6 +1,13 @@
 import { useState } from "react";
 import Container from "../components/Container";
 import PageNameSection from "../components/PageNameSection";
+import {
+  buildWebPageJsonLd,
+  buildBreadcrumbListJsonLd,
+  buildOrganizationJsonLd,
+  buildPersonJsonLd,
+  buildJsonLdGraph,
+} from "../lib/seo";
 
 export default function Contact({ settings }) {
   const [form, setForm] = useState({
@@ -49,7 +56,29 @@ export default function Contact({ settings }) {
   };
 
   return (
-    <Container settings={settings}>
+    <Container
+      settings={settings}
+      title={`Contact | ${settings.siteName}`}
+      description={`Get in touch with ${settings.personName}`}
+      canonicalPath="/contact"
+      jsonLd={buildJsonLdGraph([
+        buildOrganizationJsonLd(settings),
+        buildPersonJsonLd(settings),
+        buildWebPageJsonLd({
+          name: `Contact | ${settings.siteName}`,
+          description: `Get in touch with ${settings.personName}`,
+          path: "/contact",
+          settings,
+        }),
+        buildBreadcrumbListJsonLd(
+          [
+            { name: "Home", url: "/" },
+            { name: "Contact", url: "/contact" },
+          ],
+          settings
+        ),
+      ])}
+    >
       <div className="mt-10">
         <PageNameSection title={"Want to connect?"} />
         <section className="grid lg:grid-cols-2 gap-6 mt-6">

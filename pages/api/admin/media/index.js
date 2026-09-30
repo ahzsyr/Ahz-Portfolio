@@ -5,7 +5,8 @@ import {
   ensureUploadDir,
   parseForm,
   publicPathForFile,
-  uploadDir,
+  listUploadFiles,
+  resolveUploadPath,
 } from "../../../../lib/uploads";
 
 export const config = {
@@ -19,15 +20,7 @@ export default async function handler(req, res) {
   if (!session) return;
 
   if (req.method === "GET") {
-    ensureUploadDir();
-    const files = fs
-      .readdirSync(uploadDir)
-      .filter((name) => !name.startsWith("."))
-      .map((name) => ({
-        name,
-        path: `/uploads/${name}`,
-      }));
-    return res.status(200).json(files);
+    return res.status(200).json(listUploadFiles());
   }
 
   if (req.method === "POST") {
@@ -50,14 +43,25 @@ export default async function handler(req, res) {
       const saved = [];
       for (const file of uploaded) {
         if (!allowed.has(file.mimetype)) {
-          fs.unlinkSync(file.filepath);
+          try {
+            fs.unlinkSync(file.filepath);
+          } catch {
+            /* ignore */
+          }
           continue;
         }
         const ext = path.extname(file.originalFilename || file.filepath);
-        const target = path.join(
-          uploadDir,
-          `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`
-        );
+        const safeName = `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`;
+        const target = resolveUploadPath(safeName);
+        if (!target) {
+          try {
+            fs.unlinkSync(file.filepath);
+          } catch {
+            /* ignore */
+          }
+          continue;
+        }
+        ensureUploadDir();
         fs.renameSync(file.filepath, target);
         saved.push(publicPathForFile(target));
       }

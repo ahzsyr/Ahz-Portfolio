@@ -1,0 +1,64 @@
+:root {
+  --viz-fg: var(--color-ink, #0f172a);
+  --viz-muted: var(--color-muted, #64748b);
+  --viz-grid: #e2e8f0;
+  --viz-series-1: var(--color-brand, #2563eb);
+  --viz-series-2: var(--color-brand-deep, #1e3a8a);
+  --viz-positive: #15803d;
+  --viz-negative: #b91c1c;
+  --viz-surface: #ffffff;
+}
+
+/* Public site dark surfaces only — never follow OS preference on light admin */
+.dark {
+  --viz-fg: #e2e8f0;
+  --viz-muted: #94a3b8;
+  --viz-grid: #334155;
+  --viz-series-1: #60a5fa;
+  --viz-series-2: #93c5fd;
+  --viz-positive: #4ade80;
+  --viz-negative: #f87171;
+  --viz-surface: #0f172a;
+}
+
+/* Admin chrome is always light; pin viz tokens so OS dark mode cannot wash out previews */
+.admin-app {
+  --viz-fg: #0f172a;
+  --viz-muted: #64748b;
+  --viz-grid: #e2e8f0;
+  --viz-series-1: #2563eb;
+  --viz-series-2: #1e3a8a;
+  --viz-positive: #15803d;
+  --viz-negative: #b91c1c;
+  --viz-surface: #ffffff;
+}
+
+.viz-shell {
+  color: var(--viz-fg);
+}
+
+.viz-summary {
+  max-width: 42rem;
+}
+
+.viz-table-details {
+  border-top: 1px solid var(--viz-grid, #e2e8f0);
+  padding-top: 0.5rem;
+}
+
+.viz-table-summary {
+  list-style: none;
+}
+
+.viz-table-summary::-webkit-details-marker {
+  display: none;
+}
+
+.viz-table-summary::before {
+  content: "▸ ";
+  color: var(--viz-muted, #64748b);
+}
+
+.viz-table-details[open] .viz-table-summary::before {
+  content: "▾ ";
+}

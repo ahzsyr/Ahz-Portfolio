@@ -3,6 +3,11 @@ import CategoryChip from "../../components/CategoryChip";
 import PageNameSection from "../../components/PageNameSection";
 import ProjectList from "../../components/ProjectList";
 import Container from "../../components/Container";
+import {
+  buildWebPageJsonLd,
+  buildBreadcrumbListJsonLd,
+  buildJsonLdGraph,
+} from "../../lib/seo";
 
 const CATEGORY_CHIPS = [
   "Packages",
@@ -34,7 +39,27 @@ export default function Projects({ projects = [], settings }) {
   }, [selectedCategories, projects]);
 
   return (
-    <Container settings={settings} className="mx-auto px-4 my-auto py-4">
+    <Container
+      settings={settings}
+      title={`Projects | ${settings.siteName}`}
+      description="Selected work across design, commerce, and operations."
+      canonicalPath="/projects"
+      jsonLd={buildJsonLdGraph([
+        buildWebPageJsonLd({
+          name: `Projects | ${settings.siteName}`,
+          description: "Selected work across design, commerce, and operations.",
+          path: "/projects",
+          settings,
+        }),
+        buildBreadcrumbListJsonLd(
+          [
+            { name: "Home", url: "/" },
+            { name: "Projects", url: "/projects" },
+          ],
+          settings
+        ),
+      ])}
+    >
       <div className="mt-10">
         <PageNameSection title={"Discover my work"} />
         <div>

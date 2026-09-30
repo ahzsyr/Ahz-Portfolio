@@ -1,0 +1,18 @@
+.case-study {
+  color: var(--story-fg, #0f172a);
+}
+
+.case-study-hero-kpis {
+  margin-top: 1.5rem;
+}
+
+.case-study-tags {
+  letter-spacing: 0.04em;
+}
+
+.case-study-evidence img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}

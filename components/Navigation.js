@@ -75,6 +75,19 @@ const Navigation = ({ settings }) => {
               </Link>
             </li>
             <li className="text-white">
+              <Link href="/impact">
+                <p
+                  className={
+                    router.pathname == "/impact"
+                      ? styles.active
+                      : styles.inactive
+                  }
+                >
+                  Impact
+                </p>
+              </Link>
+            </li>
+            <li className="text-white">
               <Link href="/about">
                 <p
                   className={

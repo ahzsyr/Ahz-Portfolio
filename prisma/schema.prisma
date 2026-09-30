@@ -22,70 +22,92 @@ model Project {
   slug           String         @unique @db.VarChar(160)
   title          String         @db.VarChar(200)
   description    String         @db.Text
+  overview       String?        @db.Text
+  role           String?        @db.Text
+  challenge      String?        @db.Text
+  approach       String?        @db.Text
+  process        String?        @db.Text
+  results        String?        @db.Text
+  tags           Json?
+  evidencePaths  Json?
   client         String         @db.VarChar(200)
   tools          Json
   coverPath      String         @db.VarChar(500)
   featured       Boolean        @default(false)
   featuredOrder  Int            @default(0)
   status         String         @default("published") @db.VarChar(20)
+  presentationMode String       @default("minimal") @db.VarChar(40)
   seoTitle       String?        @db.VarChar(200)
   seoDescription String?        @db.Text
   categoryId     Int
   category       Category       @relation(fields: [categoryId], references: [id])
+  experienceId   Int?
+  experience     Experience?    @relation(fields: [experienceId], references: [id], onDelete: SetNull)
   media          ProjectMedia[]
+  achievements   Achievement[]
+  metrics        Metric[]
+  story          Story?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
   @@index([status])
   @@index([featured, featuredOrder])
+  @@index([experienceId])
 }
 
 model ProjectMedia {
-  id        Int      @id @default(autoincrement())
-  projectId Int
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  path      String   @db.VarChar(500)
-  alt       String?  @db.VarChar(255)
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
+  id          Int          @id @default(autoincrement())
+  projectId   Int
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  path        String       @db.VarChar(500)
+  alt         String?      @db.VarChar(255)
+  sortOrder   Int          @default(0)
+  storyBlocks StoryBlock[]
+  createdAt   DateTime     @default(now())
 
   @@index([projectId])
 }
 
 model Experience {
-  id        Int      @id @default(autoincrement())
-  position  String   @db.VarChar(200)
-  company   String   @db.VarChar(200)
-  period    String   @db.VarChar(100)
-  bullets   Json
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int           @id @default(autoincrement())
+  position     String        @db.VarChar(200)
+  company      String        @db.VarChar(200)
+  period       String        @db.VarChar(100)
+  bullets      Json
+  startYear    Int?
+  endYear      Int?
+  domain       String?       @db.VarChar(80)
+  sortOrder    Int           @default(0)
+  achievements Achievement[]
+  metrics      Metric[]
+  projects     Project[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model SiteSettings {
-  id           Int      @id @default(1)
-  siteName     String   @db.VarChar(120)
-  personName   String   @db.VarChar(120)
-  tagline      String   @db.Text
-  headline     String   @db.VarChar(255)
-  heroSupporting String @db.Text
-  aboutBio     String   @db.Text
-  locations    Json
-  tools        Json
-  phone        String   @db.VarChar(50)
-  phoneDisplay String   @db.VarChar(80)
-  email        String   @db.VarChar(160)
-  location     String   @db.VarChar(160)
-  linkedin     String   @db.VarChar(255)
-  linkedinHandle String @db.VarChar(80)
-  github       String   @db.VarChar(255)
-  facebook     String   @db.VarChar(255)
-  resumePath   String   @db.VarChar(255)
-  ogImagePath  String   @db.VarChar(255)
-  canonicalUrl String   @db.VarChar(255)
-  gaId         String   @db.VarChar(40)
-  updatedAt    DateTime @updatedAt
+  id             Int      @id @default(1)
+  siteName       String   @db.VarChar(120)
+  personName     String   @db.VarChar(120)
+  tagline        String   @db.Text
+  headline       String   @db.VarChar(255)
+  heroSupporting String   @db.Text
+  aboutBio       String   @db.Text
+  locations      Json
+  tools          Json
+  phone          String   @db.VarChar(50)
+  phoneDisplay   String   @db.VarChar(80)
+  email          String   @db.VarChar(160)
+  location       String   @db.VarChar(160)
+  linkedin       String   @db.VarChar(255)
+  linkedinHandle String   @db.VarChar(80)
+  github         String   @db.VarChar(255)
+  facebook       String   @db.VarChar(255)
+  resumePath     String   @db.VarChar(255)
+  ogImagePath    String   @db.VarChar(255)
+  canonicalUrl   String   @db.VarChar(255)
+  gaId           String   @db.VarChar(40)
+  updatedAt      DateTime @updatedAt
 }
 
 model Message {
@@ -97,4 +119,222 @@ model Message {
   body      String   @db.Text
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model MetricGroup {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(160)
+  slug        String   @unique @db.VarChar(180)
+  description String?  @db.Text
+  sortOrder   Int      @default(0)
+  visibility  String   @default("public") @db.VarChar(20)
+  metrics     Metric[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([visibility, sortOrder])
+}
+
+model Metric {
+  id               Int               @id @default(autoincrement())
+  name             String            @db.VarChar(160)
+  label            String?           @db.VarChar(200)
+  value            String            @db.VarChar(120)
+  valueNumeric     Float?
+  unit             String?           @db.VarChar(60)
+  type             String            @default("count") @db.VarChar(40)
+  prefix           String?           @db.VarChar(40)
+  suffix           String?           @db.VarChar(40)
+  startValue       String?           @db.VarChar(120)
+  endValue         String?           @db.VarChar(120)
+  date             DateTime?
+  category         String?           @db.VarChar(80)
+  visibility       String            @default("public") @db.VarChar(20)
+  featured         Boolean           @default(false)
+  sortOrder        Int               @default(0)
+  period           String?           @db.VarChar(20)
+  trendPreference  String            @default("neutral") @db.VarChar(30)
+  previousNumeric  Float?
+  targetNumeric    Float?
+  baselineNumeric  Float?
+  decimals         Int?
+  compact          Boolean           @default(false)
+  percentScale     String            @default("auto") @db.VarChar(20)
+  ratingMax        Float?
+  metricGroupId    Int?
+  metricGroup      MetricGroup?      @relation(fields: [metricGroupId], references: [id], onDelete: SetNull)
+  projectId        Int?
+  project          Project?          @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  experienceId     Int?
+  experience       Experience?       @relation(fields: [experienceId], references: [id], onDelete: SetNull)
+  achievementId    Int?
+  achievement      Achievement?      @relation(fields: [achievementId], references: [id], onDelete: SetNull)
+  dataPoints       MetricDataPoint[]
+  storyBlocks      StoryBlock[]
+  blockLinks       StoryBlockMetric[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([visibility, sortOrder])
+  @@index([featured])
+  @@index([metricGroupId])
+  @@index([projectId])
+  @@index([experienceId])
+  @@index([achievementId])
+  @@index([period])
+}
+
+model MetricDataPoint {
+  id           Int      @id @default(autoincrement())
+  metricId     Int
+  metric       Metric   @relation(fields: [metricId], references: [id], onDelete: Cascade)
+  date         DateTime
+  valueNumeric Float?
+  value        String?  @db.VarChar(120)
+  label        String?  @db.VarChar(120)
+  metadata     Json?
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([metricId, date])
+  @@index([metricId, date])
+  @@index([metricId, sortOrder])
+}
+
+model Achievement {
+  id           Int         @id @default(autoincrement())
+  title        String      @db.VarChar(200)
+  slug         String      @unique @db.VarChar(220)
+  description  String      @db.Text
+  type         String      @db.VarChar(60)
+  date         DateTime?
+  category     String?     @db.VarChar(80)
+  featured     Boolean     @default(false)
+  sortOrder    Int         @default(0)
+  status       String      @default("published") @db.VarChar(20)
+  projectId    Int?
+  project      Project?    @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  experienceId Int?
+  experience   Experience? @relation(fields: [experienceId], references: [id], onDelete: SetNull)
+  metrics      Metric[]
+  storyBlocks  StoryBlock[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([status, sortOrder])
+  @@index([featured])
+  @@index([projectId])
+  @@index([experienceId])
+}
+
+model Certification {
+  id            Int       @id @default(autoincrement())
+  title         String    @db.VarChar(200)
+  issuer        String    @db.VarChar(200)
+  issuedAt      DateTime
+  expiresAt     DateTime?
+  credentialUrl String?   @db.VarChar(500)
+  imagePath     String?   @db.VarChar(500)
+  sortOrder     Int       @default(0)
+  featured      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([featured, sortOrder])
+}
+
+model Education {
+  id          Int      @id @default(autoincrement())
+  institution String   @db.VarChar(200)
+  degree      String   @db.VarChar(200)
+  field       String?  @db.VarChar(200)
+  period      String   @db.VarChar(100)
+  description String?  @db.Text
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Skill {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique @db.VarChar(120)
+  category  String?  @db.VarChar(80)
+  level     String?  @db.VarChar(60)
+  sortOrder Int      @default(0)
+  featured  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([featured, sortOrder])
+  @@index([category])
+}
+
+model Milestone {
+  id          Int          @id @default(autoincrement())
+  title       String       @db.VarChar(200)
+  date        DateTime?
+  description String?      @db.Text
+  type        String?      @db.VarChar(60)
+  sortOrder   Int          @default(0)
+  featured    Boolean      @default(false)
+  storyBlocks StoryBlock[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([featured, sortOrder])
+}
+
+/// Admin-authored narrative for Impact page or a single project.
+model Story {
+  id        Int          @id @default(autoincrement())
+  slug      String       @unique @db.VarChar(180)
+  scope     String       @db.VarChar(20)
+  projectId Int?         @unique
+  project   Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title     String?      @db.VarChar(200)
+  status    String       @default("draft") @db.VarChar(20)
+  blocks    StoryBlock[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([scope, status])
+}
+
+model StoryBlock {
+  id             Int                @id @default(autoincrement())
+  storyId        Int
+  story          Story              @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  type           String             @db.VarChar(40)
+  sortOrder      Int                @default(0)
+  title          String?            @db.VarChar(200)
+  subtitle       String?            @db.VarChar(255)
+  body           String?            @db.Text
+  config         Json?
+  metricId       Int?
+  metric         Metric?            @relation(fields: [metricId], references: [id], onDelete: SetNull)
+  achievementId  Int?
+  achievement    Achievement?       @relation(fields: [achievementId], references: [id], onDelete: SetNull)
+  projectMediaId Int?
+  projectMedia   ProjectMedia?      @relation(fields: [projectMediaId], references: [id], onDelete: SetNull)
+  milestoneId    Int?
+  milestone      Milestone?         @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  metrics        StoryBlockMetric[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@index([storyId, sortOrder])
+  @@index([type])
+}
+
+model StoryBlockMetric {
+  id        Int        @id @default(autoincrement())
+  blockId   Int
+  block     StoryBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  metricId  Int
+  metric    Metric     @relation(fields: [metricId], references: [id], onDelete: Cascade)
+  sortOrder Int        @default(0)
+
+  @@unique([blockId, metricId])
+  @@index([blockId, sortOrder])
 }

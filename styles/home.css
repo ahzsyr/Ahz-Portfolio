@@ -1,0 +1,17 @@
+/* Homepage section rhythm */
+.home-section {
+  scroll-margin-top: 5rem;
+}
+
+.home-snapshot {
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.home-contact {
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #f4f7fb 55%,
+    #eef4ff 100%
+  );
+}

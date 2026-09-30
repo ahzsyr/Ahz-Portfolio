@@ -1,0 +1,25 @@
+:root {
+  --story-fg: var(--color-ink, #0f172a);
+  --story-muted: var(--color-muted, #64748b);
+  --story-gap: 3rem;
+}
+
+.story-stream {
+  color: var(--story-fg);
+}
+
+.story-section + .story-section {
+  margin-top: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --story-fg: #e2e8f0;
+    --story-muted: #94a3b8;
+  }
+}
+
+.dark {
+  --story-fg: #e2e8f0;
+  --story-muted: #94a3b8;
+}

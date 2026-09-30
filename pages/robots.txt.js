@@ -18,6 +18,10 @@ Disallow: /api
 Sitemap: ${base}/sitemap.xml
 `;
   res.setHeader("Content-Type", "text/plain");
+  res.setHeader(
+    "Cache-Control",
+    "public, s-maxage=3600, stale-while-revalidate=86400"
+  );
   res.write(body);
   res.end();
   return { props: {} };

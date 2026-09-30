@@ -1,0 +1,94 @@
+.career-stats {
+  display: grid;
+  gap: 1rem;
+}
+
+.career-timeline {
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+.career-timeline-lane {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 1rem 0;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: background 0.2s ease;
+}
+
+.career-timeline-lane:hover,
+.career-timeline-lane.is-active {
+  background: rgba(37, 99, 235, 0.04);
+}
+
+.career-timeline-years {
+  font-family: var(--font-display, Fraunces, Georgia, serif);
+  font-size: 0.8rem;
+  color: var(--color-muted, #64748b);
+  line-height: 1.35;
+  padding-top: 0.15rem;
+}
+
+.career-timeline-bar {
+  position: relative;
+  padding-left: 1.25rem;
+}
+
+.career-timeline-bar::before {
+  content: "";
+  position: absolute;
+  left: 0.35rem;
+  top: 0.4rem;
+  bottom: -1.2rem;
+  width: 2px;
+  background: var(--color-brand, #2563eb);
+  opacity: 0.35;
+}
+
+.career-timeline-lane:last-child .career-timeline-bar::before {
+  bottom: 0.4rem;
+}
+
+.career-timeline-dot-parallax {
+  position: absolute;
+  left: 0;
+  top: 0.35rem;
+}
+
+.career-timeline-dot {
+  display: block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 999px;
+  background: var(--color-brand, #2563eb);
+}
+
+.career-timeline-bar > .career-timeline-dot {
+  position: absolute;
+  left: 0;
+  top: 0.35rem;
+}
+
+.career-timeline-domain {
+  font-family: var(--font-display, Fraunces, Georgia, serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--story-fg, #0f172a);
+}
+
+.career-timeline-meta {
+  font-size: 0.875rem;
+  color: var(--story-muted, #64748b);
+  margin-top: 0.15rem;
+}
+
+.career-timeline-reveal + .career-timeline-reveal {
+  margin-top: 0;
+}

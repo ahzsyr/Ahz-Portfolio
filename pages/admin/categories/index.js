@@ -1,72 +1,107 @@
 import { useState } from "react";
 import AdminLayout from "../../../components/admin/AdminLayout";
+import PageHeader from "../../../components/admin/PageHeader";
+import Modal from "../../../components/admin/Modal";
+import ConfirmDialog from "../../../components/admin/ConfirmDialog";
 import { getAdminSession } from "../../../lib/admin";
 import { prisma } from "../../../lib/prisma";
 import { getSiteSettings } from "../../../lib/content";
 
 export default function AdminCategories({ categories: initial, settings }) {
   const [categories, setCategories] = useState(initial);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const refresh = async () => {
     const res = await fetch("/api/admin/categories");
     setCategories(await res.json());
   };
 
-  const create = async (e) => {
+  const openCreate = () => {
+    setEditing(null);
+    setName("");
+    setError("");
+    setModalOpen(true);
+  };
+
+  const openEdit = (cat) => {
+    setEditing(cat);
+    setName(cat.name);
+    setError("");
+    setModalOpen(true);
+  };
+
+  const save = async (e) => {
     e.preventDefault();
+    setSaving(true);
     setError("");
     const res = await fetch("/api/admin/categories", {
-      method: "POST",
+      method: editing ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, sortOrder: categories.length }),
+      body: JSON.stringify(
+        editing
+          ? { id: editing.id, name, sortOrder: editing.sortOrder }
+          : { name, sortOrder: categories.length }
+      ),
     });
     const data = await res.json();
+    setSaving(false);
     if (!res.ok) {
       setError(data.error || "Failed");
       return;
     }
-    setName("");
+    setModalOpen(false);
     refresh();
   };
 
-  const remove = async (id) => {
-    if (!confirm("Delete category?")) return;
+  const remove = async () => {
+    if (!deleteId) return;
+    setDeleting(true);
+    setDeleteError("");
     const res = await fetch("/api/admin/categories", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify({ id: deleteId }),
     });
     const data = await res.json();
+    setDeleting(false);
     if (!res.ok) {
-      alert(data.error || "Delete failed");
+      setDeleteError(data.error || "Delete failed");
       return;
     }
+    setDeleteId(null);
     refresh();
   };
 
   return (
     <AdminLayout siteName={settings.siteName}>
-      <h1 className="text-3xl font-semibold mb-6">Categories</h1>
-      <form onSubmit={create} className="flex gap-2 mb-6">
-        <input
-          className="border rounded px-3 py-2"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="New category name"
-          required
-        />
-        <button className="px-4 py-2 bg-blue-600 text-white rounded" type="submit">
-          Add
-        </button>
-      </form>
-      {error && <p className="text-red-600 mb-3">{error}</p>}
+      <PageHeader
+        title="Categories"
+        description="Organize projects by category."
+        actions={
+          <button
+            type="button"
+            onClick={openCreate}
+            className="px-4 py-2 bg-blue-600 text-white rounded"
+          >
+            Add category
+          </button>
+        }
+      />
       <div className="bg-white border rounded-lg">
+        {categories.length === 0 && (
+          <p className="px-4 py-6 text-slate-500 text-sm">No categories yet.</p>
+        )}
         {categories.map((cat) => (
           <div
             key={cat.id}
-            className="flex items-center justify-between border-b px-4 py-3"
+            className="flex items-center justify-between border-b last:border-b-0 px-4 py-3 gap-3"
           >
             <div>
               <p className="font-medium">{cat.name}</p>
@@ -74,16 +109,82 @@ export default function AdminCategories({ categories: initial, settings }) {
                 {cat._count?.projects || 0} projects · {cat.slug}
               </p>
             </div>
-            <button
-              type="button"
-              className="text-red-600"
-              onClick={() => remove(cat.id)}
-            >
-              Delete
-            </button>
+            <div className="flex gap-3 shrink-0">
+              <button
+                type="button"
+                className="text-blue-600"
+                onClick={() => openEdit(cat)}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                className="text-red-600"
+                onClick={() => {
+                  setDeleteError("");
+                  setDeleteId(cat.id);
+                }}
+              >
+                Delete
+              </button>
+            </div>
           </div>
         ))}
       </div>
+
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title={editing ? "Edit category" : "Add category"}
+        size="md"
+        footer={
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setModalOpen(false)}
+              className="px-4 py-2 rounded border border-slate-300 hover:bg-slate-100"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="category-form"
+              disabled={saving}
+              className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-60"
+            >
+              {saving ? "Saving…" : "Save"}
+            </button>
+          </div>
+        }
+      >
+        <form id="category-form" onSubmit={save} className="space-y-3">
+          <div>
+            <label className="block text-sm mb-1">Name</label>
+            <input
+              className="w-full border rounded px-3 py-2"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              autoFocus
+            />
+          </div>
+          {error && <p className="text-red-600 text-sm">{error}</p>}
+        </form>
+      </Modal>
+
+      <ConfirmDialog
+        open={Boolean(deleteId)}
+        onClose={() => setDeleteId(null)}
+        onConfirm={remove}
+        title="Delete category"
+        message={
+          deleteError ||
+          "Delete this category? Projects must be reassigned first if any use it."
+        }
+        confirmLabel="Delete"
+        danger
+        loading={deleting}
+      />
     </AdminLayout>
   );
 }

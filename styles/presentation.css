@@ -1,0 +1,111 @@
+/* Per-project presentation modes — CSS-first theming */
+
+.project-presentation {
+  --pp-hero-h: 24em;
+  --pp-gallery-cols: 2;
+  --pp-section-gap: 3rem;
+  --pp-type-scale: 1;
+  --pp-prose-max: 42rem;
+}
+
+.project-presentation .story-stream,
+.project-presentation .case-study {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pp-section-gap);
+}
+
+.project-presentation .story-hero > div {
+  height: var(--pp-hero-h) !important;
+}
+
+.project-presentation .story-section {
+  max-width: none;
+}
+
+/* Minimal — current default feel */
+.project-presentation--minimal {
+  --pp-hero-h: 24em;
+  --pp-gallery-cols: 2;
+  --pp-section-gap: 2.75rem;
+}
+
+/* Creative — large imagery, airy type */
+.project-presentation--creative {
+  --pp-hero-h: 32em;
+  --pp-gallery-cols: 2;
+  --pp-section-gap: 4rem;
+  --pp-type-scale: 1.08;
+}
+
+.project-presentation--creative .story-section h2,
+.project-presentation--creative .font-display {
+  letter-spacing: -0.02em;
+}
+
+.project-presentation--creative .story-section .grid {
+  gap: 1.25rem;
+}
+
+.project-presentation--creative img {
+  border-radius: 0;
+}
+
+/* Business — dense KPI / chart band */
+.project-presentation--business {
+  --pp-hero-h: 20em;
+  --pp-section-gap: 2rem;
+}
+
+.project-presentation--business .story-stream > :is(.story-section) {
+  margin-bottom: 0;
+}
+
+.project-presentation--business [class*="kpi"],
+.project-presentation--business .viz-shell {
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+/* Technical — compact, monospace accents */
+.project-presentation--technical {
+  --pp-hero-h: 18em;
+  --pp-section-gap: 2.25rem;
+  --pp-prose-max: 40rem;
+}
+
+.project-presentation--technical .story-section header p:first-child,
+.project-presentation--technical .font-display.text-xs {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.12em;
+}
+
+.project-presentation--technical .rich-text {
+  max-width: var(--pp-prose-max);
+}
+
+/* Career — timeline-forward rhythm */
+.project-presentation--career {
+  --pp-hero-h: 22em;
+  --pp-section-gap: 3.25rem;
+}
+
+.project-presentation--career .story-section {
+  border-left: 2px solid rgba(37, 99, 235, 0.25);
+  padding-left: 1.25rem;
+}
+
+.project-presentation--career .story-hero {
+  border-left: none;
+  padding-left: 0;
+}
+
+/* Gallery column hint via CSS grid children when present */
+.project-presentation--creative .story-section .grid.sm\:grid-cols-2 {
+  grid-template-columns: repeat(var(--pp-gallery-cols), minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  .project-presentation--creative {
+    --pp-gallery-cols: 2;
+  }
+}

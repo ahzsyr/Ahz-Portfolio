@@ -1,5 +1,6 @@
 import { requireAdmin } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
+import { sanitizeHtmlForStorage } from "../../../../lib/sanitizeHtml";
 
 export default async function handler(req, res) {
   const session = await requireAdmin(req, res);
@@ -12,6 +13,8 @@ export default async function handler(req, res) {
 
   if (req.method === "PUT") {
     const body = req.body || {};
+    const heroSupporting = sanitizeHtmlForStorage(body.heroSupporting || "");
+    const aboutBio = sanitizeHtmlForStorage(body.aboutBio || "");
     const settings = await prisma.siteSettings.upsert({
       where: { id: 1 },
       update: {
@@ -19,8 +22,8 @@ export default async function handler(req, res) {
         personName: body.personName,
         tagline: body.tagline,
         headline: body.headline,
-        heroSupporting: body.heroSupporting,
-        aboutBio: body.aboutBio,
+        heroSupporting,
+        aboutBio,
         locations: body.locations || [],
         tools: body.tools || [],
         phone: body.phone,
@@ -42,8 +45,8 @@ export default async function handler(req, res) {
         personName: body.personName || "Ali Zahedah",
         tagline: body.tagline || "",
         headline: body.headline || "",
-        heroSupporting: body.heroSupporting || "",
-        aboutBio: body.aboutBio || "",
+        heroSupporting: heroSupporting || "",
+        aboutBio: aboutBio || "",
         locations: body.locations || [],
         tools: body.tools || [],
         phone: body.phone || "",

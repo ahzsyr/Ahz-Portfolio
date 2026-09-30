@@ -27,22 +27,36 @@ services:
     environment:
       DATABASE_URL: mysql://${MYSQL_USER:-azura}:${MYSQL_PASSWORD:-azura_pass}@db:3306/${MYSQL_DATABASE:-azura}
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
-      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-change-me-in-production}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:?Set NEXTAUTH_SECRET in .env to a long random string}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@azura.local}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-changeme}
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
       NEXT_PUBLIC_GA_ID: ${NEXT_PUBLIC_GA_ID:-G-WE9VQ42BG0}
-      RUN_SEED: ${RUN_SEED:-true}
+      RUN_SEED: ${RUN_SEED:-false}
+      SEED_MODE: ${SEED_MODE:-safe}
     volumes:
       - azura_uploads:/app/public/uploads
     expose:
       - "3000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 40s
 
   nginx:
     image: nginx:1.27-alpine
     restart: unless-stopped
     depends_on:
-      - app
+      app:
+        condition: service_healthy
     ports:
       - "3000:80"
     volumes:

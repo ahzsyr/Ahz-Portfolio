@@ -2,6 +2,8 @@
 
 Personal portfolio platform (**AZURA Portfolio**) built with **Next.js 15**, **React 19**, **Tailwind CSS**, **MySQL**, and a custom **`/admin`** dashboard. The public site name defaults to **AZURA Portfolio** and can be renamed anytime in **Admin → Settings** (for example to `ahz`).
 
+**Version:** 1.0.0 — see [docs/UPGRADE.md](docs/UPGRADE.md) for upgrades, seed modes, and compatibility guarantees.
+
 ## Requirements
 
 - Node.js 20.9+ (local) **or** Docker & Docker Compose
@@ -11,6 +13,8 @@ Personal portfolio platform (**AZURA Portfolio**) built with **Next.js 15**, **R
 
 ```bash
 cp .env.example .env
+# Set NEXTAUTH_SECRET and ADMIN_PASSWORD before production use
+# Fresh empty DB only: RUN_SEED=true SEED_MODE=fresh
 docker compose up --build
 ```
 
@@ -29,8 +33,8 @@ Default credentials (change in `.env`):
 cp .env.example .env
 # Start MySQL (Compose db only is fine), then:
 npm install
-npx prisma db push
-npm run db:seed
+npm run db:migrate
+SEED_MODE=fresh npm run db:seed   # only on empty DB
 npm run dev
 ```
 
@@ -40,13 +44,17 @@ npm run dev
 | `npm run build` | Production build |
 | `npm start` | Run production server |
 | `npm run lint` | ESLint |
-| `npm run db:setup` | Push schema + seed |
-| `npm run db:seed` | Seed categories, projects, experience, settings |
+| `npm run db:migrate` | Apply Prisma migrations |
+| `npm run db:push` | Dev-only schema push |
+| `npm run db:setup` | Migrate + fresh seed (empty DB) |
+| `npm run db:seed` | Seed (`SEED_MODE=safe` default) |
+| `npm run db:backfill` | Backfill slugs / presentationMode |
+| `npm test` | Unit tests |
 
 ## Stack
 
 - Next.js 15 (Pages Router, Node runtime)
-- MySQL 8 + Prisma
+- MySQL 8 + Prisma (migrate deploy)
 - NextAuth (Credentials) for admin
 - Framer Motion, Swiper, Google Analytics
 - nginx reverse proxy in Docker

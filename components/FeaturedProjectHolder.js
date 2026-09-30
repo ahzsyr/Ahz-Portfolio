@@ -1,7 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { projectHeroLayoutId } from "../lib/motion";
+import useMotionAllowed from "./motion/useMotionAllowed";
 
 export const FeaturedProjectHolder = ({ project, styles, large, margined }) => {
+  const motionOk = useMotionAllowed();
+  const layoutId = projectHeroLayoutId(project);
+
   const st = styles
     ? `${styles} bg-blue-500 overflow-hidden group relative `
     : "bg-blue-500 overflow-hidden group relative ";
@@ -52,7 +58,11 @@ export const FeaturedProjectHolder = ({ project, styles, large, margined }) => {
           </Link>
         </div>
       </div>
-      <div className={holderHeight}>
+      <motion.div
+        className={holderHeight}
+        layoutId={motionOk ? layoutId : undefined}
+        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      >
         <Image
           src={project.image}
           className={
@@ -65,10 +75,10 @@ export const FeaturedProjectHolder = ({ project, styles, large, margined }) => {
           sizes="(max-width: 768px) 100vw,
               (max-width: 1200px) 50vw,
               33vw"
-        ></Image>
+        />
 
-        <div className="absolute top-0 right-0 bottom-0 left-0 w-full h-full overflow-hidden opacity-0 transition duration-300 ease-in-out bg-gradient-to-t from-gray-600 via-blue-500 to-blue-800 group-hover:opacity-70"></div>
-      </div>
+        <div className="absolute top-0 right-0 bottom-0 left-0 w-full h-full overflow-hidden opacity-0 transition duration-300 ease-in-out bg-gradient-to-t from-gray-600 via-blue-500 to-blue-800 group-hover:opacity-70" />
+      </motion.div>
     </div>
   );
 };

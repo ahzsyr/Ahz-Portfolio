@@ -1,6 +1,7 @@
 import { prisma } from "../../lib/prisma";
 
 const hits = new Map();
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function rateLimited(ip) {
   const now = Date.now();
@@ -32,6 +33,7 @@ export default async function handler(req, res) {
 
   const { firstName, lastName, email, phone, body, company } = req.body || {};
 
+  // Honeypot
   if (company) {
     return res.status(200).json({ ok: true });
   }
@@ -40,12 +42,17 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
+  const emailStr = String(email).trim().slice(0, 160);
+  if (!EMAIL_RE.test(emailStr)) {
+    return res.status(400).json({ error: "Invalid email" });
+  }
+
   try {
     await prisma.message.create({
       data: {
         firstName: String(firstName).slice(0, 100),
         lastName: String(lastName).slice(0, 100),
-        email: String(email).slice(0, 160),
+        email: emailStr,
         phone: phone ? String(phone).slice(0, 50) : null,
         body: String(body).slice(0, 5000),
       },
